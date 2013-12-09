@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""This module crawls and stores tweets from a single user"""
+"""This module crawls and stores tweets from a single user."""
 
 import tweepy
 import time
@@ -7,39 +7,67 @@ import pickle
 
 from config import *
 
-auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-auth.set_access_token(access_token, access_token_secret)
 
-api = tweepy.API(auth)
+class TweetsCrawler(object):
+    def __init__(self, user, storage_file, max_tweets):
+        self.auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+        self.auth.set_access_token(access_token, access_token_secret)
+        self.api = tweepy.API(self.auth)
 
-tweet_list = []
-i = None
+        self.user = user
+        self.storage_file = storage_file
+        self.max_tweets = max_tweets
 
-while True:
-    print '---- Storage length: {0} // Last id: {1}'.format(len(tweet_list), i)
-    print
-    for result in api.user_timeline(screen_name='Tawil', count=100, max_id=i,
-                                    include_rts=False, exclude_replies=True):
-        i = result.id - 1
+        try:
+            current_tweets = pickle.load(open(storage_file))
+        except IOError:
+            current_tweets = []
 
-        tweet = {}
+        if(len(current_tweets) > 0):
+            self.tweet_list = current_tweets
+            self.since_id = current_tweets[0]['id']
+        else:
+            self.tweet_list = []
 
-        tweet['id'] = result.id
-        tweet['text'] = result.text
+        print len(self.tweet_list)
 
-        print result.text
+    def crawl(self):
+        i = None
 
-        tweet_list.append(tweet)
+        while True:
+            request = self.api.user_timeline(screen_name=self.user,
+                                             count=100,
+                                             max_id=i, include_rts=False,
+                                             exclude_replies=True)
+            for result in request:
+                i = result.id - 1
 
-    if len(tweet_list) >= 100:
-        break
+                tweet = {}
 
-    time.sleep(5)
+                tweet['id'] = result.id
+                tweet['text'] = result.text
 
-print
-print 'Saving data...'
-data_export = open('data/tweets.db', 'w')
+                print result.text
 
-pickle.dump(tweet_list, data_export)
+                self.tweet_list.append(tweet)
 
-print 'Done.'
+            if len(self.tweet_list) >= self.max_tweets:
+                break
+
+            time.sleep(5)
+
+        self.save()
+
+    def save(self):
+        #ensure only max_tweets are stored
+        data_export = open(self.storage_file, 'w')
+        pickle.dump(self.tweet_list, data_export)
+        print 'Saved.'
+
+
+def main():
+    crawler = TweetsCrawler('Tawil', 'data/tweets.db', 100)
+    crawler.crawl()
+
+if __name__ == '__main__':
+    main()
