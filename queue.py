@@ -18,7 +18,7 @@ def tweet():
     t.send_tweet()
 
 
-schedule.every(1).minutes.do(tweet)
+schedule.every(15).minutes.do(tweet)
 schedule.every().hour.do(crawl)
 
 while True:

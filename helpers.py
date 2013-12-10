@@ -10,7 +10,7 @@ def processTweet(tweet):
     tweet = re.sub(r'((www\.[\s]+)|(https?://[^\s]+))', '', tweet)
 
     #users
-    #tweet = re.sub(r'@[^\s]+', '', tweet)
+    tweet = re.sub(r'@[^\s]+', '', tweet)
 
     #hashtags
     #tweet = re.sub(r'#([^\s]+)', '', tweet)

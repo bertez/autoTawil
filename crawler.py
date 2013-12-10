@@ -72,6 +72,9 @@ class TweetCrawler(object):
         data_export = open(self.storage_file, 'w')
 
         pickle.dump(sorted_list[:self.max_tweets], data_export)
+
+        self.since_id = self.tweet_list[0]['id']
+
         print 'Saved.'
 
 
