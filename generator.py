@@ -81,8 +81,8 @@ class TweetGenerator(object):
 
 
 def main():
-    crawler = TweetGenerator('data/tweets.db', 10)
-    crawler.send_tweet()
+    tweeter = TweetGenerator('data/tweets.db', 10)
+    tweeter.send_tweet()
 
 if __name__ == '__main__':
     main()
