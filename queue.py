@@ -28,7 +28,8 @@ def crawl():
 def tweet():
     text = t.generate()
 
-    print('Tweeting:', text)
+    print('Tweeting:')
+    print text
 
     try:
         api.update_status(text)
@@ -36,7 +37,7 @@ def tweet():
         print e
 
 
-schedule.every(1).minutes.do(tweet)
+schedule.every(10).minutes.do(tweet)
 schedule.every().hour.do(crawl)
 
 while True:
