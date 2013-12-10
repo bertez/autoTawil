@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 """This module uses a simple Markov Chain algorithm to generate random tweets
-using the crawled tweets archive as seeed"""
+using the crawled tweets archive as seed."""
 
 import pickle
 from collections import defaultdict
 from random import random
 from random import choice
+import tweepy
 
 from config import *
+
 
 class TweetGenerator(object):
     def __init__(self, archive, samples):
@@ -15,12 +17,16 @@ class TweetGenerator(object):
         self.tweets = pickle.load(open(archive))
         self.samples = samples
 
+        self.auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+        self.auth.set_access_token(access_token, access_token_secret)
+        self.api = tweepy.API(self.auth)
+
         self.titles = []
 
         for tweet in self.tweets:
             self.titles.append(tweet['text'])
 
-        self.markov_map = defaultdict(lambda : defaultdict(int))
+        self.markov_map = defaultdict(lambda: defaultdict(int))
 
         self.lookback = 2
 
@@ -65,12 +71,18 @@ class TweetGenerator(object):
             if flag:
                 sentences.append(sentence)
 
-        print choice(sentences)
+        return choice(sentences)
+
+    def send_tweet(self):
+        try:
+            self.api.update_status(self.generate())
+        except tweepy.TweepError as e:
+            print e
 
 
 def main():
     crawler = TweetGenerator('data/tweets.db', 10)
-    crawler.generate()
+    crawler.send_tweet()
 
 if __name__ == '__main__':
     main()
