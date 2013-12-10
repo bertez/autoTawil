@@ -6,29 +6,28 @@ import pickle
 from collections import defaultdict
 from random import random
 from random import choice
-import tweepy
-
-from config import *
 
 
 class TweetGenerator(object):
     def __init__(self, archive, samples):
 
-        self.tweets = pickle.load(open(archive))
+        self.archive = archive
         self.samples = samples
 
-        self.auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-        self.auth.set_access_token(access_token, access_token_secret)
-        self.api = tweepy.API(self.auth)
-
+        self.tweets = []
         self.titles = []
-
-        for tweet in self.tweets:
-            self.titles.append(tweet['text'])
 
         self.markov_map = defaultdict(lambda: defaultdict(int))
 
         self.lookback = 2
+
+    def update_database(self):
+
+        self.tweets = pickle.load(open(self.archive))
+        self.titles = []
+
+        for tweet in self.tweets:
+            self.titles.append(tweet['text'])
 
         #Generate map in the form word1 -> word2 -> occurences of word2 after word1
         for title in self.titles:
@@ -73,16 +72,11 @@ class TweetGenerator(object):
 
         return choice(sentences)
 
-    def send_tweet(self):
-        try:
-            self.api.update_status(self.generate())
-        except tweepy.TweepError as e:
-            print e
-
 
 def main():
     tweeter = TweetGenerator('data/tweets.db', 10)
-    tweeter.send_tweet()
+    tweeter.update_database()
+    print tweeter.generate()
 
 if __name__ == '__main__':
     main()
