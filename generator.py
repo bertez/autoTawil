@@ -17,11 +17,13 @@ class TweetGenerator(object):
         self.tweets = []
         self.titles = []
 
-        self.markov_map = defaultdict(lambda: defaultdict(int))
+        self.markov_map = None
 
         self.lookback = 2
 
     def update_database(self):
+
+        self.markov_map = defaultdict(lambda: defaultdict(int))
 
         self.tweets = pickle.load(open(self.archive))
         self.titles = []
