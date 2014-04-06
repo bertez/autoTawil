@@ -72,7 +72,11 @@ class TweetGenerator(object):
             if flag:
                 sentences.append(sentence)
 
-        return choice(sentences)
+        candidates = [tweet for tweet in sentences if len(tweet) < 140]
+
+        #print len(candidates)
+
+        return choice(candidates)
 
 
 def main():

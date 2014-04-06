@@ -4,13 +4,13 @@ import string
 
 def processTweet(tweet):
 
-    characters = set(string.punctuation)
+    #characters = set(string.punctuation)
 
     #urls
-    tweet = re.sub(r'((www\.[\s]+)|(https?://[^\s]+))', '', tweet)
+    #tweet = re.sub(r'((www\.[\s]+)|(https?://[^\s]+))', '', tweet)
 
     #users
-    tweet = re.sub(r'@[^\s]+', '', tweet)
+    tweet = re.sub(r'@([^\s]+)', '\g<1>', tweet)
 
     #hashtags
     #tweet = re.sub(r'#([^\s]+)', '', tweet)
